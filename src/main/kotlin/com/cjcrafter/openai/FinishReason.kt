@@ -29,7 +29,16 @@ enum class FinishReason {
      * This occurrence is rare, and usually only happens when you blatantly
      * misuse/violate OpenAI's terms.
      */
-    CONTENT_FILTER;
+    CONTENT_FILTER,
+
+    /**
+     * [FUNCTION_CALL] occurs when ChatGPT calls a function, and awaits us
+     * to give it a response to the function.
+     *
+     * @see com.cjcrafter.openai.chat.ChatFunction
+     */
+    FUNCTION_CALL;
+
 
     companion object {
 

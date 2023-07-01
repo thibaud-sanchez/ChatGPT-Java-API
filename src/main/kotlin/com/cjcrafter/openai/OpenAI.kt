@@ -329,6 +329,7 @@ open class OpenAI @JvmOverloads constructor(
             val httpResponse = client.newCall(httpRequest).execute()
             var response: ChatResponseChunk? = null
             OpenAICallback(true, onFailure) {
+                println("Raw Content: $it")
                 if (response == null)
                     response = gson.fromJson(it, ChatResponseChunk::class.java)
                 else

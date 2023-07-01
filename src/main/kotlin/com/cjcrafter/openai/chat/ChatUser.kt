@@ -33,7 +33,12 @@ enum class ChatUser {
     /**
      * [ASSISTANT] is the AI that generates responses.
      */
-    ASSISTANT;
+    ASSISTANT,
+
+    /**
+     * TODO docs
+     */
+    FUNCTION;
 
     companion object {
 

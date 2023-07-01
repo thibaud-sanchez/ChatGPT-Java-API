@@ -1,6 +1,7 @@
 package com.cjcrafter.openai.chat
 
 import com.google.gson.annotations.SerializedName
+import java.lang.IllegalStateException
 
 /**
  * [ChatRequest] holds the configurable options that can be sent to the OpenAI
@@ -46,6 +47,8 @@ import com.google.gson.annotations.SerializedName
 data class ChatRequest @JvmOverloads constructor(
     var model: String,
     var messages: MutableList<ChatMessage>,
+    var functions: MutableList<ChatFunction>? = null,
+    @field:SerializedName("function_call") var functionCall: String? = null,
     var temperature: Float? = null,
     @field:SerializedName("top_p") var topP: Float? = null,
     var n: Int? = null,
@@ -73,6 +76,8 @@ data class ChatRequest @JvmOverloads constructor(
      *
      * @property model            The model used to generate the text. Recommended: `"gpt-3.5-turbo"` (without quotes).
      * @property messages         A mutable list of previous messages from the conversation.
+     * @property functions        A list of functions that ChatGPT can use.
+     * @property functionCall     Which function to force ChatGPT to use. (Using null or "auto" lets ChatGPT decide if it needs to call a function, and which one to choose).
      * @property temperature      How "creative" the results are. [0.0, 2.0]. Defaults to `1.0`.
      * @property topP             Controls how "on topic" the tokens are. Defaults to `1.0`.
      * @property n                Controls how many responses to generate. Numbers >1 will chew through your tokens. Defaults to `1`.
@@ -88,6 +93,8 @@ data class ChatRequest @JvmOverloads constructor(
 
         private lateinit var model: String
         private lateinit var messages: MutableList<ChatMessage>
+        private var functions: MutableList<ChatFunction>? = null
+        private var functionCall: String? = null
         private var temperature: Float? = null
         private var topP: Float? = null
         private var n: Int? = null
@@ -113,6 +120,17 @@ data class ChatRequest @JvmOverloads constructor(
          * @return the [Builder] instance with the updated messages property.
          */
         fun messages(messages: MutableList<ChatMessage>) = apply { this.messages = messages }
+
+        fun functions(functions: MutableList<ChatFunction>?) = apply { this.functions = functions }
+
+        fun functionCall(functionCall: String?): Builder {
+            if (functionCall != null && functions == null)
+                throw IllegalStateException("Use Builder#functions(List<ChatFunction>) before specifying which function to call!")
+
+            //todo function name check
+            //if (functionCall != null && functions!!.contains())
+            return apply { this.functionCall = functionCall }
+        }
 
         /**
          * Sets the temperature for the generated text.
@@ -196,6 +214,8 @@ data class ChatRequest @JvmOverloads constructor(
             return ChatRequest(
                 model = model,
                 messages = messages,
+                functions = functions,
+                functionCall = functionCall,
                 temperature = temperature,
                 topP = topP,
                 n = n,
